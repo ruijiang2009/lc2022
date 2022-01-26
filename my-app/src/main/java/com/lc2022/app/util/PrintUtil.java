@@ -10,6 +10,7 @@ public class PrintUtil {
       }
       System.out.print("\n");
     }
+    System.out.println("---------------------");
   }
 
   public static void print2DIntList(List<List<Integer>> array) {
@@ -19,5 +20,6 @@ public class PrintUtil {
       }
       System.out.print("\n");
     }
+    System.out.println("---------------------");
   }
 }
