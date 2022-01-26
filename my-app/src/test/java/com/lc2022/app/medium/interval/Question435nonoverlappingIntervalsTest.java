@@ -1,5 +1,6 @@
-package com.lc2022.app.medium;
+package com.lc2022.app.medium.interval;
 
+import com.lc2022.app.medium.interval.Question435NonOverlappingIntervals;
 import org.junit.Assert;
 import org.junit.Test;
 

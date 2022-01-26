@@ -1,5 +1,6 @@
-package com.lc2022.app.medium;
+package com.lc2022.app.medium.interval;
 
+import com.lc2022.app.medium.interval.Question1272RemoveInterval;
 import com.lc2022.app.util.PrintUtil;
 import org.junit.Test;
 

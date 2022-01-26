@@ -1,4 +1,4 @@
-package com.lc2022.app.medium;
+package com.lc2022.app.medium.interval;
 
 import java.util.ArrayList;
 import java.util.Arrays;
