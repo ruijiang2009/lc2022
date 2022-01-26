@@ -7,11 +7,7 @@ import java.util.List;
 
 public class Question435NonOverlappingIntervals {
   public int eraseOverlapIntervals(int[][] intervals) {
-    List<Interval> intervalList = new ArrayList<>();
-    for(int[] interval : intervals) {
-      intervalList.add(new Interval(interval[0], interval[1]));
-    }
-    Collections.sort(intervalList, new MyComparator());
+    List<Interval> intervalList = sortIntervalList(intervals);
 
     int count = 0;
     int end = intervalList.get(0).end;
@@ -27,6 +23,15 @@ public class Question435NonOverlappingIntervals {
       }
     }
     return count;
+  }
+
+  private List<Interval> sortIntervalList(int[][] intervals) {
+    List<Interval> intervalList = new ArrayList<>();
+    for(int[] interval : intervals) {
+      intervalList.add(new Interval(interval[0], interval[1]));
+    }
+    Collections.sort(intervalList, new MyComparator());
+    return intervalList;
   }
 
   class Interval {
