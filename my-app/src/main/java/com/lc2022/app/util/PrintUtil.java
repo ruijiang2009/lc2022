@@ -30,4 +30,10 @@ public class PrintUtil {
     }
     System.out.println("---------------------");
   }
+
+  public static void printStrList(List<String> input) {
+    for(String s : input) {
+      System.out.println(s);
+    }
+  }
 }
