@@ -4,17 +4,12 @@ import java.util.*;
 
 public class Question336PalindromePairs {
   class TrieNode {
-    public int wordEnding = -1; // We'll use -1 to mean there's no word ending here.
-    public Map<Character, TrieNode> next = new HashMap<>();
-    public List<Integer> palindromePrefixRemaining = new ArrayList<>();
+    Character value;
+    Map<Character, TrieNode> children = new HashMap<>();
+    List<Integer> endIds = new ArrayList<>();
+    List<Integer> palindromeSuffixIds = new ArrayList<>();
   }
 
-
-
-  // Is the given string a palindrome after index i?
-  // Tip: Leave this as a method stub in an interview unless you have time
-  // or the interviewer tells you to write it. The Trie itself should be
-  // the main focus of your time.
   public boolean hasPalindromeRemaining(String s, int i) {
     int p1 = i;
     int p2 = s.length() - 1;
@@ -27,53 +22,69 @@ public class Question336PalindromePairs {
   }
 
   public List<List<Integer>> palindromePairs(String[] words) {
-    TrieNode trie = new TrieNode();
-
-    // Build the Trie
-    for (int wordId = 0; wordId < words.length; wordId++) {
+    // construct TrieNode
+    TrieNode root = new TrieNode();
+    for(int wordId = 0; wordId < words.length; wordId++) {
       String word = words[wordId];
-      String reversedWord = new StringBuilder(word).reverse().toString();
-      TrieNode currentTrieLevel = trie;
-      for (int j = 0; j < word.length(); j++) {
-        if (hasPalindromeRemaining(reversedWord, j)) {
-          currentTrieLevel.palindromePrefixRemaining.add(wordId);
+      String reverseWord = (new StringBuilder(word)).reverse().toString();
+      TrieNode pre = root;
+      for(int j = 0; j < reverseWord.length(); j++) {
+        TrieNode cur = pre.children.getOrDefault(reverseWord.charAt(j), new TrieNode());
+        cur.value = reverseWord.charAt(j);
+        pre.children.put(cur.value, cur);
+        if (j == reverseWord.length()-1) {
+          cur.endIds.add(wordId);
         }
-        Character c = reversedWord.charAt(j);
-        if (!currentTrieLevel.next.containsKey(c)) {
-          currentTrieLevel.next.put(c, new TrieNode());
+        if(hasPalindromeRemaining(reverseWord, j)) {
+          pre.palindromeSuffixIds.add(wordId);
         }
-        currentTrieLevel = currentTrieLevel.next.get(c);
-      }
-      currentTrieLevel.wordEnding = wordId;
-    }
-
-    // Find pairs
-    List<List<Integer>> pairs = new ArrayList<>();
-    for (int wordId = 0; wordId < words.length; wordId++) {
-      String word = words[wordId];
-      TrieNode currentTrieLevel = trie;
-      for (int j = 0; j < word.length(); j++) {
-        // Check for pairs of case 3.
-        if (currentTrieLevel.wordEnding != -1
-            && hasPalindromeRemaining(word, j)) {
-          pairs.add(Arrays.asList(wordId, currentTrieLevel.wordEnding));
-        }
-        // Move down to the next trie level.
-        Character c = word.charAt(j);
-        currentTrieLevel = currentTrieLevel.next.get(c);
-        if (currentTrieLevel == null) break;
-      }
-      if (currentTrieLevel == null) continue;
-      // Check for pairs of case 1. Note the check to prevent non distinct pairs.
-      if (currentTrieLevel.wordEnding != -1 && currentTrieLevel.wordEnding != wordId) {
-        pairs.add(Arrays.asList(wordId, currentTrieLevel.wordEnding));
-      }
-      // Check for pairs of case 2.
-      for (int other : currentTrieLevel.palindromePrefixRemaining) {
-        pairs.add(Arrays.asList(wordId, other));
+        pre = cur;
       }
     }
 
-    return pairs;
+    List<List<Integer>> result= new ArrayList<>();
+    for(int wordId = 0; wordId < words.length; wordId++) {
+      String word = words[wordId];
+      if (word.length() == 0) {
+        for(int id : root.palindromeSuffixIds) {
+          if(id != wordId) {
+            result.add(Arrays.asList(wordId, id));
+            result.add(Arrays.asList(id, wordId));
+          }
+        }
+        continue;
+      }
+      TrieNode pre = root;
+      for(int j = 0; j < word.length(); j++) {
+        if(pre == null) {
+          continue;
+        }
+        TrieNode cur = pre.children.get(word.charAt(j));
+
+        if (j == word.length()-1 && cur != null) {
+          for(int id : cur.endIds) {
+            if (id != wordId) {
+              result.add(Arrays.asList(wordId, id));
+            }
+          }
+
+          for(int id : cur.palindromeSuffixIds) {
+            if (id != wordId) {
+              result.add(Arrays.asList(wordId, id));
+            }
+          }
+        }
+
+        if (!pre.endIds.isEmpty() && hasPalindromeRemaining(word, j)) {
+          for(int id : pre.endIds) {
+            result.add(Arrays.asList(wordId, id));
+          }
+        }
+
+        pre = cur;
+      }
+    }
+
+    return result;
   }
 }
