@@ -17,66 +17,73 @@ public class Question269AlienDictionary {
     }
   }
 
-  private Map<Character, List<String>> updateEdges(List<String> words, Map<Character, Node> graph) {
-    String pre = words.get(0);
-    Map<Character, List<String>> newGroups = new HashMap<>();
-    if(pre.length() > 1) {
-      List<String> group = new ArrayList<>();
-      group.add(pre.substring(1));
-      newGroups.put(pre.charAt(0), group);
-    }
-    for(int i =1; i < words.size(); i++) {
-      String cur = words.get(i);
-      if(cur.length() > 1) {
-        List<String> group = newGroups.getOrDefault(cur.charAt(0), new ArrayList<>());
-        group.add(cur.substring(1));
-        newGroups.put(cur.charAt(0), group);
-      }
-      if (pre.length() >= 1 && cur.length() >= 1) {
-        if (pre.charAt(0) != cur.charAt(0)) {
-          Node fromNode = graph.getOrDefault(pre.charAt(0), new Node(pre.charAt(0)));
-          Node toNode = graph.getOrDefault(cur.charAt(0), new Node(cur.charAt(0)));
-          fromNode.neighbours.add(cur.charAt(0));
-          toNode.indegree++;
-          graph.put(pre.charAt(0), fromNode);
-          graph.put(cur.charAt(0), toNode);
-        }
-      }
-    }
-    return newGroups;
-  }
-
   public String alienOrder(String[] words) {
+    if (words == null || words.length == 0) {
+      return "";
+    }
     Map<Character, Node> graph = new HashMap<>();
-    List<String> wordList = Arrays.asList(words);
-    Queue<Map<Character, List<String>>> records = new LinkedList<>();
-    Map<Character, List<String>> newGroups = updateEdges(wordList, graph);
-    records.add(newGroups);
-    while(!records.isEmpty()) {
-      Map<Character, List<String>> group = records.poll();
-      for(Character key : group.keySet()) {
-        wordList = newGroups.get(key);
-        Map<Character, List<String>> newGroup = updateEdges(wordList, graph);
-        if(!newGroup.isEmpty()) {
-          records.add(newGroup);
-        }
+    String pre = words[0];
+    Node node = null;
+    for(String word : words) {
+      for(char c : word.toCharArray()) {
+        graph.put(c, new Node(c));
       }
     }
-    int nodeNumber = graph.keySet().size();
-    PriorityQueue<Node> pq = new PriorityQueue<>();
-    pq.addAll(graph.values());
+
+    for(int i = 1; i < words.length; i++) {
+      String cur = words[i];
+      if (pre.length() > cur.length() && pre.startsWith(cur)) {
+        return "";
+      }
+      for (int j = 0; j < Math.min(pre.length(), cur.length()); j++) {
+        char preChar = pre.charAt(j);
+        char curChar = cur.charAt(j);
+        if (preChar == curChar) {
+          node = graph.get (preChar);
+          graph.put(preChar, node);
+        } else {
+          Node fromNode = graph.get(preChar);
+          Node toNode = graph.get(curChar);
+          if (!fromNode.neighbours.contains(curChar)) {
+            fromNode.neighbours.add(curChar);
+            toNode.indegree++;
+          }
+          graph.put(preChar, fromNode);
+          graph.put(curChar, toNode);
+          break;
+        }
+      }
+      pre = cur;
+    }
 
     StringBuilder sb = new StringBuilder();
-    while(!pq.isEmpty()) {
-      Node node = pq.poll();
-      if (0 == node.indegree) {
-        sb.append(node.value);
-        for(Character c : node.neighbours) {
-          Node p = graph.get(c);
-          p.indegree--;
+
+    Queue<Node> queue = new LinkedList<>();
+
+    int numberofNodes = graph.size();
+    for(Node n : graph.values()) {
+      if (n.indegree == 0) {
+        node = n;
+        queue.add(n);
+      }
+    }
+
+    if (node == null) {
+      return "";
+    }
+
+    while(!queue.isEmpty()) {
+      node = queue.poll();
+      sb.append(node.value);
+      for(Character c : node.neighbours) {
+        Node p = graph.get(c);
+        p.indegree--;
+        if (p.indegree == 0) {
+          queue.add(p);
         }
       }
     }
-    return sb.length() == nodeNumber ? sb.toString() : "";
+
+    return sb.length() == numberofNodes ? sb.toString() : "";
   }
 }
