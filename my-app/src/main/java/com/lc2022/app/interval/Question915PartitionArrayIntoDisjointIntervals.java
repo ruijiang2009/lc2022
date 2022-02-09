@@ -1,4 +1,4 @@
-package com.lc2022.app.medium.interval;
+package com.lc2022.app.interval;
 
 public class Question915PartitionArrayIntoDisjointIntervals {
   public int partitionDisjoint(int[] nums) {

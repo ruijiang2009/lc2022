@@ -1,4 +1,4 @@
-package com.lc2022.app.medium.interval;
+package com.lc2022.app.interval;
 
 import org.junit.Assert;
 import org.junit.Test;
